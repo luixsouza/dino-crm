@@ -57,7 +57,6 @@ const SYSTEM_PROMPT = `Você é o assistente virtual da **Barbearia Seu Dino**. 
     "updated_fields": {"nome": "valor", "whatsapp": "numero"},
     "tags_to_apply": ["tag1"],
     "automation_trigger": "schedule_appointment|offer_subscription|human_handoff",
-    "lead_score": 1-10,
     "suggested_task": {
       "title": "Confirmar agendamento",
       "type": "appointment|followup|call",
@@ -93,7 +92,6 @@ serve(async (req) => {
 - WhatsApp: ${lead.whatsapp || 'Não informado'}
 - Email: ${lead.email || 'Não informado'}
 - Estágio Atual: ${lead.stage || 'lead'}
-- Score Atual: ${lead.lead_score || 1}
 - Barbeiro Preferido: ${lead.preferred_barber || 'Sem preferência'}
 - Plano de Assinatura: ${lead.subscription_plan || 'Nenhum'}
 - Status Assinatura: ${lead.subscription_status || 'none'}
@@ -162,7 +160,6 @@ serve(async (req) => {
           current_stage: lead.stage || 'lead',
           updated_fields: {},
           tags_to_apply: ['followup_pendente'],
-          lead_score: lead.lead_score || 1,
         }
       };
     }
@@ -175,7 +172,6 @@ serve(async (req) => {
         updated_fields: parsed.backend_log?.updated_fields || {},
         tags_to_apply: parsed.backend_log?.tags_to_apply || [],
         automation_trigger: parsed.backend_log?.automation_trigger,
-        lead_score: parsed.backend_log?.lead_score || lead.lead_score || 1,
         suggested_task: parsed.backend_log?.suggested_task,
         suggested_appointment: parsed.backend_log?.suggested_appointment,
       }

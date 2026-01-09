@@ -134,6 +134,9 @@ export function useLeads() {
 }
 
 export function useTags() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
   const { data: tags = [], isLoading } = useQuery({
     queryKey: ['tags'],
     queryFn: async () => {
@@ -147,5 +150,66 @@ export function useTags() {
     },
   });
 
-  return { tags, isLoading };
+  const createTag = useMutation({
+    mutationFn: async (tag: Partial<Tag>) => {
+      const { data, error } = await supabase
+        .from('tags')
+        .insert(tag)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
+      toast({ title: 'Tag criada com sucesso' });
+    },
+    onError: (error) => {
+      toast({ title: 'Erro ao criar tag', description: error.message, variant: 'destructive' });
+    }
+  });
+
+  const updateTag = useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<Tag> & { id: string }) => {
+      const { data, error } = await supabase
+        .from('tags')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
+      toast({ title: 'Tag atualizada com sucesso' });
+    },
+    onError: (error) => {
+      toast({ title: 'Erro ao atualizar tag', description: error.message, variant: 'destructive' });
+    }
+  });
+
+  const deleteTag = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('tags').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
+      toast({ title: 'Tag removida' });
+    },
+    onError: (error) => {
+      toast({ title: 'Erro ao remover tag', description: error.message, variant: 'destructive' });
+    }
+  });
+
+  return { 
+    tags, 
+    isLoading,
+    createTag,
+    updateTag,
+    deleteTag
+  };
 }

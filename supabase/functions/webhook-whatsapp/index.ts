@@ -143,7 +143,6 @@ serve(async (req) => {
         .update({
           ...backend_log.updated_fields,
           stage: backend_log.current_stage,
-          lead_score: backend_log.lead_score,
           last_contact_at: new Date().toISOString(),
         })
         .eq('id', lead.id);

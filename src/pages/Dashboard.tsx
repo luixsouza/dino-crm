@@ -3,12 +3,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useLeads } from '@/hooks/useLeads';
 import { useTasks } from '@/hooks/useTasks';
 import { useAppointments, useSubscribers, useServices } from '@/hooks/useAppointments';
-import { Users, Calendar, AlertCircle, CheckCircle2, Scissors, CreditCard, TrendingUp, Clock } from 'lucide-react';
+import { Users, Calendar, AlertCircle, CheckCircle2, Scissors, CreditCard, TrendingUp, Clock, Pencil } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useState } from 'react';
+import { ServicesDialog } from '@/components/settings/ServicesDialog';
 
 export default function Dashboard() {
   const { leads, isLoading: leadsLoading } = useLeads();
@@ -16,6 +18,7 @@ export default function Dashboard() {
   const { todayAppointments, weekAppointments, pendingConfirmations, isLoading: appointmentsLoading } = useAppointments();
   const { subscribers, mrr, isLoading: subscribersLoading } = useSubscribers();
   const { services } = useServices();
+  const [showServicesDialog, setShowServicesDialog] = useState(false);
 
   const isLoading = leadsLoading || tasksLoading || appointmentsLoading || subscribersLoading;
 
@@ -147,12 +150,17 @@ export default function Dashboard() {
         <div className="grid gap-4 md:grid-cols-2">
           {/* Serviços Oferecidos */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Scissors className="h-5 w-5" />
-                Serviços
-              </CardTitle>
-              <CardDescription>Tabela de preços</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div className="space-y-1.5">
+                <CardTitle className="flex items-center gap-2">
+                  <Scissors className="h-5 w-5" />
+                  Serviços
+                </CardTitle>
+                <CardDescription>Tabela de preços</CardDescription>
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => setShowServicesDialog(true)}>
+                <Pencil className="h-4 w-4" />
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
@@ -220,6 +228,7 @@ export default function Dashboard() {
         </div>
 
       </div>
+      <ServicesDialog open={showServicesDialog} onOpenChange={setShowServicesDialog} />
     </AppLayout>
   );
 }

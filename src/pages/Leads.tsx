@@ -9,9 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Phone, Mail, Search, Plus, Filter, Trash2 } from 'lucide-react';
+import { Phone, Mail, Search, Plus, Filter, Trash2, Tag } from 'lucide-react';
 import { LeadDetailSheet } from '@/components/leads/LeadDetailSheet';
 import { CreateLeadDialog } from '@/components/leads/CreateLeadDialog';
+import { TagsDialog } from '@/components/settings/TagsDialog';
 
 export default function Leads() {
   const { leads, isLoading, deleteLead } = useLeads();
@@ -21,6 +22,7 @@ export default function Leads() {
   const [stageFilter, setStageFilter] = useState<string>('all');
   const [tagFilter, setTagFilter] = useState<string>('all');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showTagsDialog, setShowTagsDialog] = useState(false);
 
   const filteredLeads = leads.filter(lead => {
     const matchesSearch = 
@@ -55,10 +57,16 @@ export default function Leads() {
             <h1 className="text-2xl font-bold text-foreground">Leads</h1>
             <p className="text-muted-foreground">{filteredLeads.length} leads encontrados</p>
           </div>
-          <Button onClick={() => setShowCreateDialog(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Novo Lead
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setShowTagsDialog(true)}>
+              <Tag className="h-4 w-4 mr-2" />
+              Tags
+            </Button>
+            <Button onClick={() => setShowCreateDialog(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Lead
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}
@@ -220,6 +228,7 @@ export default function Leads() {
 
       <LeadDetailSheet lead={selectedLead} onClose={() => setSelectedLead(null)} />
       <CreateLeadDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} />
+      <TagsDialog open={showTagsDialog} onOpenChange={setShowTagsDialog} />
     </AppLayout>
   );
 }

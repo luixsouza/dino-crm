@@ -96,6 +96,8 @@ export function useAppointments() {
 }
 
 export function useServices() {
+  const queryClient = useQueryClient();
+
   const { data: services = [], isLoading } = useQuery({
     queryKey: ['services'],
     queryFn: async () => {
@@ -110,7 +112,73 @@ export function useServices() {
     },
   });
 
-  return { services, isLoading };
+  const createService = useMutation({
+    mutationFn: async (service: Partial<Service>) => {
+      const { data, error } = await supabase
+        .from('services')
+        .insert([{ ...service, is_active: true }])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['services'] });
+      toast.success('Serviço criado com sucesso!');
+    },
+    onError: (error) => {
+      toast.error('Erro ao criar serviço: ' + error.message);
+    }
+  });
+
+  const updateService = useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<Service> & { id: string }) => {
+      const { data, error } = await supabase
+        .from('services')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['services'] });
+      toast.success('Serviço atualizado com sucesso!');
+    },
+    onError: (error) => {
+      toast.error('Erro ao atualizar serviço: ' + error.message);
+    }
+  });
+
+  const deleteService = useMutation({
+    mutationFn: async (id: string) => {
+      // Soft delete
+      const { error } = await supabase
+        .from('services')
+        .update({ is_active: false })
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['services'] });
+      toast.success('Serviço removido com sucesso!');
+    },
+    onError: (error) => {
+      toast.error('Erro ao remover serviço: ' + error.message);
+    }
+  });
+
+  return { 
+    services, 
+    isLoading,
+    createService,
+    updateService,
+    deleteService
+  };
 }
 
 export function useSubscriptionPlans() {
