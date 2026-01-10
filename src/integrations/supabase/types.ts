@@ -16,6 +16,7 @@ export interface Database {
           id: string
           lead_id: string
           notes: string | null
+          reminder_sent: boolean
           scheduled_at: string
           service_id: string
           status: string
@@ -27,6 +28,7 @@ export interface Database {
           id?: string
           lead_id: string
           notes?: string | null
+          reminder_sent?: boolean
           scheduled_at: string
           service_id: string
           status?: string
@@ -38,6 +40,7 @@ export interface Database {
           id?: string
           lead_id?: string
           notes?: string | null
+          reminder_sent?: boolean
           scheduled_at?: string
           service_id?: string
           status?: string

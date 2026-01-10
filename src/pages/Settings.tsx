@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';
-import { Loader2, Webhook, Key, Users, User, CalendarDays } from 'lucide-react';
+import { Loader2, Webhook, Key, Users, User, CalendarDays, Bell } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RolesManager } from "@/components/settings/RolesManager";
 import { HolidaysManager } from "@/components/settings/HolidaysManager";
@@ -50,10 +50,11 @@ export default function Settings() {
         </div>
 
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="general">Geral</TabsTrigger>
             <TabsTrigger value="roles">Funções</TabsTrigger>
             <TabsTrigger value="holidays">Feriados</TabsTrigger>
+            <TabsTrigger value="notifications">Notificações</TabsTrigger>
             <TabsTrigger value="integrations">Integrações</TabsTrigger>
           </TabsList>
           
@@ -120,6 +121,68 @@ export default function Settings() {
                 </CardHeader>
                 <CardContent>
                     <HolidaysManager />
+                </CardContent>
+             </Card>
+          </TabsContent>
+
+          <TabsContent value="notifications" className="space-y-4">
+             <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Bell className="h-5 w-5" />
+                        Automação de Lembretes
+                    </CardTitle>
+                    <CardDescription>
+                        Configure e teste o envio automático de lembretes via WhatsApp e E-mail.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="bg-muted p-4 rounded-lg">
+                        <h3 className="font-medium mb-2">Status do Sistema</h3>
+                        <p className="text-sm text-muted-foreground mb-4">
+                            O sistema executa verificações automáticas a cada hora para enviar lembretes de agendamentos próximos (24h).
+                        </p>
+                        <Button 
+                            onClick={async () => {
+                                setLoading(true);
+                                try {
+                                    // First verify if we have environment variables needed
+                                    const { data, error } = await supabase.functions.invoke('send-appointment-reminders');
+                                    
+                                    if (error) {
+                                      console.error("Function error:", error);
+                                      // Improve error message for common local issues
+                                      if (error.message === "Failed to send request" || error.message.includes("Connection refused")) {
+                                        throw new Error("A função não está rodando. Execute 'supabase functions serve' no terminal.");
+                                      }
+                                      throw error;
+                                    }
+                                    
+                                    if (data?.error) {
+                                        throw new Error(data.error);
+                                    }
+
+                                    toast({ 
+                                        title: 'Verificação concluída', 
+                                        description: `Lembretes processados: ${data.processed || 0}` 
+                                    });
+                                } catch (err: any) {
+                                    console.error("Verification error:", err);
+                                    toast({ 
+                                        variant: 'destructive', 
+                                        title: 'Erro na verificação', 
+                                        description: err.message || "Erro desconhecido. Verifique o console."
+                                    });
+                                } finally {
+                                    setLoading(false);
+                                }
+                            }} 
+                            disabled={loading}
+                        >
+                            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Rodar Verificação Manual
+                        </Button>
+                    </div>
                 </CardContent>
              </Card>
           </TabsContent>
