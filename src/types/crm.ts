@@ -40,6 +40,7 @@ export interface Service {
   description?: string;
   duration_minutes: number;
   price: number;
+  commission_percentage?: number;
   is_active: boolean;
   created_at: string;
 }

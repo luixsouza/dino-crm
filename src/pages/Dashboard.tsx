@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useState } from 'react';
 import { ServicesDialog } from '@/components/settings/ServicesDialog';
+import { CommissionsDialog } from '@/components/finance/CommissionsDialog';
 
 export default function Dashboard() {
   const { leads, isLoading: leadsLoading } = useLeads();
@@ -19,6 +20,7 @@ export default function Dashboard() {
   const { subscribers, mrr, isLoading: subscribersLoading } = useSubscribers();
   const { services } = useServices();
   const [showServicesDialog, setShowServicesDialog] = useState(false);
+  const [showCommissionsDialog, setShowCommissionsDialog] = useState(false);
 
   const isLoading = leadsLoading || tasksLoading || appointmentsLoading || subscribersLoading;
 
@@ -38,9 +40,15 @@ export default function Dashboard() {
     <AppLayout>
       <div className="p-6 space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">🦖 Dino CRM</h1>
-          <p className="text-muted-foreground">Dashboard - {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">🦖 Dino CRM</h1>
+            <p className="text-muted-foreground">Dashboard - {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}</p>
+          </div>
+          <Button variant="outline" onClick={() => setShowCommissionsDialog(true)}>
+            <CreditCard className="mr-2 h-4 w-4" />
+            Comissões
+          </Button>
         </div>
 
         {/* Agendamentos do Dia - Destaque */}
@@ -223,6 +231,7 @@ export default function Dashboard() {
               <Button variant="outline" className="w-full mt-4" asChild>
                 <Link to="/tasks">Ver Todas as Tarefas</Link>
               </Button>
+      <CommissionsDialog open={showCommissionsDialog} onOpenChange={setShowCommissionsDialog} />
             </CardContent>
           </Card>
         </div>

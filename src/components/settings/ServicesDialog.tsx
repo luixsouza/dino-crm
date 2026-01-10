@@ -53,6 +53,7 @@ export function ServicesDialog({ open, onOpenChange }: ServicesDialogProps) {
       name: '',
       duration_minutes: 30,
       price: 0,
+      commission_percentage: 0,
     });
     setIsCreating(true);
   };
@@ -101,6 +102,16 @@ export function ServicesDialog({ open, onOpenChange }: ServicesDialogProps) {
                   required
                 />
               </div>
+              <div className="space-y-2">
+                <Label>Comissão (%)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={editingService.commission_percentage || 0}
+                  onChange={(e) => setEditingService({ ...editingService, commission_percentage: Number(e.target.value) })}
+                />
+              </div>
             </div>
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => setEditingService(null)}>
@@ -129,6 +140,7 @@ export function ServicesDialog({ open, onOpenChange }: ServicesDialogProps) {
                     <TableHead>Nome</TableHead>
                     <TableHead>Duração</TableHead>
                     <TableHead>Preço</TableHead>
+                    <TableHead>Comissão</TableHead>
                     <TableHead className="w-[100px]">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -151,6 +163,7 @@ export function ServicesDialog({ open, onOpenChange }: ServicesDialogProps) {
                         <TableCell className="font-medium">{service.name}</TableCell>
                         <TableCell>{service.duration_minutes} min</TableCell>
                         <TableCell>{formatCurrency(service.price)}</TableCell>
+                        <TableCell>{service.commission_percentage || 0}%</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Button
