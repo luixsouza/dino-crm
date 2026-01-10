@@ -16,12 +16,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ProductsDialog } from '@/components/settings/ProductsDialog';
 
 export function OrdersPage() {
     const { orders, isLoading, createOrder, updateOrderStatus } = useOrders();
     const [isCreateOpen, setIsCreateOpen] = useState(false);
-    const [isProductsOpen, setIsProductsOpen] = useState(false);
 
     return (
         <AppLayout>
@@ -32,10 +30,6 @@ export function OrdersPage() {
                         <p className="text-muted-foreground">Gerencie pedidos e serviços</p>
                     </div>
                     <div className="flex gap-2">
-                        <Button variant="outline" onClick={() => setIsProductsOpen(true)}>
-                            <ShoppingCart className="mr-2 h-4 w-4" />
-                            Produtos
-                        </Button>
                         <Button onClick={() => setIsCreateOpen(true)}>
                             <Plus className="mr-2 h-4 w-4" />
                             Nova Comanda
@@ -54,7 +48,6 @@ export function OrdersPage() {
                 </div>
 
                 <CreateOrderDialog open={isCreateOpen} onOpenChange={setIsCreateOpen} />
-                <ProductsDialog open={isProductsOpen} onOpenChange={setIsProductsOpen} />
             </div>
         </AppLayout>
     );

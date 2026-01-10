@@ -14,6 +14,7 @@ import {
   Scissors,
   ClipboardList,
   DollarSign,
+  Package,
 } from 'lucide-react';
 
 const navItems = [
@@ -21,6 +22,7 @@ const navItems = [
   { href: '/pipeline', icon: Calendar, label: 'Funil' },
   { href: '/leads', icon: Users, label: 'Clientes' },
   { href: '/orders', icon: ClipboardList, label: 'Comandas' },
+  { href: '/products', icon: Package, label: 'Produtos' },
   { href: '/finance', icon: DollarSign, label: 'Financeiro' },
   { href: '/chat', icon: MessageSquare, label: 'Chat Bot' },
   { href: '/tasks', icon: CheckSquare, label: 'Tarefas' },
