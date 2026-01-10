@@ -47,6 +47,36 @@ export function useAppointments() {
   // Create appointment
   const createAppointment = useMutation({
     mutationFn: async (data: { lead_id: string; service_id: string; barber_id?: string; scheduled_at: string; notes?: string }) => {
+      
+      // Check for schedule blocks
+      if (data.barber_id) {
+        const { data: service, error: serviceError } = await supabase
+          .from('services')
+          .select('duration_minutes')
+          .eq('id', data.service_id)
+          .single();
+
+        if (serviceError) throw serviceError;
+
+        const duration = service.duration_minutes || 30;
+        const startDate = new Date(data.scheduled_at);
+        const endDate = new Date(startDate.getTime() + duration * 60000);
+
+        const { data: blocks, error: blocksError } = await supabase
+          .from('schedule_blocks')
+          .select('*')
+          .eq('profile_id', data.barber_id)
+          .lt('start_time', endDate.toISOString())
+          .gt('end_time', startDate.toISOString());
+
+        if (blocksError) throw blocksError;
+
+        if (blocks && blocks.length > 0) {
+          const reason = blocks[0].reason ? `: ${blocks[0].reason}` : "";
+          throw new Error(`O profissional está bloqueado neste horário${reason}`);
+        }
+      }
+
       const { data: result, error } = await supabase
         .from('appointments')
         .insert(data)

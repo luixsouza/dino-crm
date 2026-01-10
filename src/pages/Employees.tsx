@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
-import { Plus, Pencil, Trash2, Users, UserCircle, CalendarClock } from "lucide-react";
+import { Plus, Pencil, Trash2, Users, UserCircle, CalendarClock, Ban } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -23,6 +23,7 @@ import {
 import { useEmployees, Employee } from "@/hooks/useEmployees";
 import { EmployeeDialog } from "@/components/employees/EmployeeDialog";
 import { WorkScheduleDialog } from "@/components/employees/WorkScheduleDialog";
+import { ScheduleBlocksDialog } from "@/components/employees/ScheduleBlocksDialog";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -33,8 +34,11 @@ export default function Employees() {
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
+  const [isBlocksOpen, setIsBlocksOpen] = useState(false);
+  
   const [employeeToEdit, setEmployeeToEdit] = useState<Employee | undefined>(undefined);
   const [employeeToSchedule, setEmployeeToSchedule] = useState<Employee | null>(null);
+  const [employeeToBlock, setEmployeeToBlock] = useState<Employee | null>(null);
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
 
   const handleEdit = (employee: Employee) => {
@@ -45,6 +49,11 @@ export default function Employees() {
   const handleSchedule = (employee: Employee) => {
       setEmployeeToSchedule(employee);
       setIsScheduleOpen(true);
+  };
+  
+  const handleBlocks = (employee: Employee) => {
+    setEmployeeToBlock(employee);
+    setIsBlocksOpen(true);
   };
 
   const handleDelete = async () => {
@@ -152,7 +161,15 @@ export default function Employees() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                         <Button
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Bloqueios"
+                          onClick={() => handleBlocks(employee)}
+                        >
+                          <Ban className="h-4 w-4" />
+                        </Button>
+                        <Button
                           variant="ghost"
                           size="icon"
                           title="Expediente"
@@ -194,6 +211,12 @@ export default function Employees() {
             open={isScheduleOpen}
             onOpenChange={setIsScheduleOpen}
             employee={employeeToSchedule}
+        />
+
+        <ScheduleBlocksDialog 
+            open={isBlocksOpen} 
+            onOpenChange={setIsBlocksOpen} 
+            employee={employeeToBlock} 
         />
 
         <AlertDialog open={!!employeeToDelete} onOpenChange={() => setEmployeeToDelete(null)}>

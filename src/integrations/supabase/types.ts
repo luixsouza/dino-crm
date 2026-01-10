@@ -170,6 +170,43 @@ export interface Database {
         }
         Relationships: []
       },
+      schedule_blocks: {
+        Row: {
+            id: string
+            profile_id: string
+            start_time: string
+            end_time: string
+            reason: string | null
+            created_at: string
+            updated_at: string
+        }
+        Insert: {
+            id?: string
+            profile_id: string
+            start_time: string
+            end_time: string
+            reason?: string | null
+            created_at?: string
+            updated_at?: string
+        }
+        Update: {
+            id?: string
+            profile_id?: string
+            start_time?: string
+            end_time?: string
+            reason?: string | null
+            created_at?: string
+            updated_at?: string
+        }
+        Relationships: [
+            {
+                foreignKeyName: "schedule_blocks_profile_id_fkey"
+                columns: ["profile_id"]
+                referencedRelation: "profiles"
+                referencedColumns: ["id"]
+            }
+        ]
+      },
       commissions: {
         Row: {
           amount: number
@@ -221,7 +258,8 @@ export interface Database {
             referencedColumns: ["id"]
           }
         ]
-      }
+      },
+
       conversations: {
         Row: {
           channel: string
