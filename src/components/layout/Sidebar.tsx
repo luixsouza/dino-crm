@@ -12,12 +12,16 @@ import {
   LogOut,
   Calendar,
   Scissors,
+  ClipboardList,
+  DollarSign,
 } from 'lucide-react';
 
 const navItems = [
   { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/pipeline', icon: Calendar, label: 'Funil' },
   { href: '/leads', icon: Users, label: 'Clientes' },
+  { href: '/orders', icon: ClipboardList, label: 'Comandas' },
+  { href: '/finance', icon: DollarSign, label: 'Financeiro' },
   { href: '/chat', icon: MessageSquare, label: 'Chat Bot' },
   { href: '/tasks', icon: CheckSquare, label: 'Tarefas' },
 ];
