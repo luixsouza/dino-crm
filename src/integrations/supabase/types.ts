@@ -137,6 +137,39 @@ export interface Database {
             }
         ]
       },
+      holidays: {
+        Row: {
+            id: string
+            date: string
+            description: string
+            is_closed: boolean
+            open_time: string | null
+            close_time: string | null
+            created_at: string
+            updated_at: string
+        }
+        Insert: {
+            id?: string
+            date: string
+            description: string
+            is_closed?: boolean
+            open_time?: string | null
+            close_time?: string | null
+            created_at?: string
+            updated_at?: string
+        }
+        Update: {
+            id?: string
+            date?: string
+            description?: string
+            is_closed?: boolean
+            open_time?: string | null
+            close_time?: string | null
+            created_at?: string
+            updated_at?: string
+        }
+        Relationships: []
+      },
       commissions: {
         Row: {
           amount: number

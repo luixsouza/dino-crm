@@ -7,9 +7,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';
-import { Loader2, Webhook, Key, Users, User } from 'lucide-react';
+import { Loader2, Webhook, Key, Users, User, CalendarDays } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RolesManager } from "@/components/settings/RolesManager";
+import { HolidaysManager } from "@/components/settings/HolidaysManager";
 
 export default function Settings() {
   const { profile } = useAuth();
@@ -49,9 +50,10 @@ export default function Settings() {
         </div>
 
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="general">Geral</TabsTrigger>
-            <TabsTrigger value="roles">Funções & Equipe</TabsTrigger>
+            <TabsTrigger value="roles">Funções</TabsTrigger>
+            <TabsTrigger value="holidays">Feriados</TabsTrigger>
             <TabsTrigger value="integrations">Integrações</TabsTrigger>
           </TabsList>
           
@@ -101,6 +103,23 @@ export default function Settings() {
                 </CardHeader>
                 <CardContent>
                     <RolesManager />
+                </CardContent>
+             </Card>
+          </TabsContent>
+
+          <TabsContent value="holidays" className="space-y-4">
+             <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <CalendarDays className="h-5 w-5" />
+                        Feriados e Datas Especiais
+                    </CardTitle>
+                    <CardDescription>
+                        Configure os dias em que a barbearia estará fechada ou terá horário reduzido.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <HolidaysManager />
                 </CardContent>
              </Card>
           </TabsContent>
