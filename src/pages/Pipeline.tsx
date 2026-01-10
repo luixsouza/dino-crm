@@ -13,9 +13,11 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { PipelineDialog } from '@/components/pipelines/PipelineDialog';
 import { StagesDialog } from '@/components/pipelines/StagesDialog';
+import { AddExistingLeadDialog } from '@/components/pipelines/AddExistingLeadDialog';
+import { CreateLeadDialog } from '@/components/leads/CreateLeadDialog';
 
 export default function Pipeline() {
-  const { leads, isLoading, updateLeadStage } = useLeads();
+  const { leads, isLoading, updateLeadStage, updateLead } = useLeads();
   const { pipelines, isLoading: pipelinesLoading } = usePipelines();
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [draggedLead, setDraggedLead] = useState<Lead | null>(null);
@@ -24,6 +26,9 @@ export default function Pipeline() {
   // Dialog states
   const [showPipelineDialog, setShowPipelineDialog] = useState(false);
   const [showStagesDialog, setShowStagesDialog] = useState(false);
+  const [showAddExistsDialog, setShowAddExistsDialog] = useState(false);
+  const [showCreateLeadDialog, setShowCreateLeadDialog] = useState(false);
+  const [activeStageForCreate, setActiveStageForCreate] = useState<string>('');
   const [pipelineToEdit, setPipelineToEdit] = useState<CustomPipeline | null>(null);
 
   useEffect(() => {
@@ -45,15 +50,33 @@ export default function Pipeline() {
   };
 
   const handleDrop = (stageKey: string) => {
-    if (draggedLead && draggedLead.stage !== stageKey) {
-      updateLeadStage.mutate({ id: draggedLead.id, stage: stageKey as LeadStage });
+    if (draggedLead) {
+        // Support both legacy stage and new pipeline_stage_id
+        const needsUpdate = draggedLead.pipeline_stage_id !== stageKey && draggedLead.stage !== stageKey;
+        
+        if (needsUpdate) {
+            // If we are in a custom pipeline (stageKey is likely a UUID), use updateLead
+            // to set pipeline_stage_id. 
+            // We also try to set 'stage' for legacy compatibility if it's not a UUID, 
+            // but for custom pipelines checking stageKey format might be needed.
+            // Simplified: just update both or prefer pipeline_stage_id.
+            
+            updateLead.mutate({
+                id: draggedLead.id,
+                pipeline_stage_id: stageKey,
+                // Only update 'stage' if it matches the legacy enum to avoid constraint errors
+                // OR if we know the constraint is removed. 
+                // For now, we rely on pipeline_stage_id for custom pipelines.
+            });
+        }
     }
     setDraggedLead(null);
   };
 
   const getLeadsByStage = (stageKey: string) => {
-    // Basic filtering, in real scenario filter by pipeline_id too
-    return leads.filter(l => l.stage === stageKey);
+    return leads.filter(l => 
+        l.pipeline_stage_id === stageKey || l.stage === stageKey
+    );
   };
 
   const activeStages = pipelines.find(p => p.id === selectedPipelineId)?.stages?.map(s => ({
@@ -127,13 +150,34 @@ export default function Pipeline() {
 
         {/* Pipeline Selector */}
         {pipelines.length > 0 && (
-          <Tabs value={selectedPipelineId} onValueChange={setSelectedPipelineId} className="w-full mb-4">
-            <TabsList>
-              {pipelines.map(p => (
-                <TabsTrigger key={p.id} value={p.id}>{p.name}</TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+          <div className="flex items-center justify-between mb-4">
+            <Tabs value={selectedPipelineId} onValueChange={setSelectedPipelineId} className="w-auto">
+                <TabsList>
+                {pipelines.map(p => (
+                    <TabsTrigger key={p.id} value={p.id}>{p.name}</TabsTrigger>
+                ))}
+                </TabsList>
+            </Tabs>
+             {selectedPipeline && (
+                <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setShowAddExistsDialog(true)}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Mover Cliente
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setShowStagesDialog(true)}>
+                    <Columns className="w-4 h-4 mr-2" />
+                    Etapas
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => {
+                        setPipelineToEdit(selectedPipeline || null);
+                        setShowPipelineDialog(true);
+                    }}>
+                    <Pencil className="w-4 h-4 mr-2" />
+                    Editar
+                    </Button>
+                </div>
+            )}
+          </div>
         )}
 
         {/* Empty State or Kanban Board */}
@@ -167,13 +211,25 @@ export default function Pipeline() {
                     {/* Stage Header */}
                     <div className="p-3 border-b border-border flex items-center gap-2">
                       <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: stage.color }}
+                        styles={{ backgroundColor: stage.color }}
                       />
                       <h3 className="font-semibold text-foreground">{stage.label}</h3>
-                      <Badge variant="secondary" className="ml-auto">
-                        {stageLeads.length}
-                      </Badge>
+                      <div className="ml-auto flex items-center gap-1">
+                          <Badge variant="secondary">
+                            {stageLeads.length}
+                          </Badge>
+                           <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6"
+                            onClick={() => {
+                                setActiveStageForCreate(stage.key);
+                                setShowCreateLeadDialog(true);
+                            }}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                      </div>
                     </div>
 
                     {/* Cards */}
@@ -280,6 +336,22 @@ export default function Pipeline() {
           pipelineId={selectedPipeline.id}
         />
       )}
+
+      {selectedPipeline && activeStages.length > 0 && (
+          <AddExistingLeadDialog
+            open={showAddExistsDialog}
+            onOpenChange={setShowAddExistsDialog}
+            pipelineId={selectedPipeline.id}
+            firstStageId={activeStages[0].key}
+          />
+      )}
+
+      <CreateLeadDialog 
+        open={showCreateLeadDialog} 
+        onOpenChange={setShowCreateLeadDialog}
+        pipelineId={selectedPipelineId}
+        initialStage={activeStageForCreate}
+      />
     </AppLayout>
   );
 }

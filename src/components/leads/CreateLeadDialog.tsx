@@ -10,9 +10,11 @@ import { Loader2 } from 'lucide-react';
 interface CreateLeadDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  pipelineId?: string;
+  initialStage?: string;
 }
 
-export function CreateLeadDialog({ open, onOpenChange }: CreateLeadDialogProps) {
+export function CreateLeadDialog({ open, onOpenChange, pipelineId, initialStage }: CreateLeadDialogProps) {
   const { createLead } = useLeads();
   const [loading, setLoading] = useState(false);
 
@@ -29,6 +31,8 @@ export function CreateLeadDialog({ open, onOpenChange }: CreateLeadDialogProps) 
         estimated_budget: formData.get('budget') ? parseFloat(formData.get('budget') as string) : undefined,
         main_pain: formData.get('pain') as string || undefined,
         source: 'manual',
+        pipeline_id: pipelineId,
+        stage: initialStage,
       });
       onOpenChange(false);
     } finally {

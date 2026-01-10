@@ -7,10 +7,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useState } from 'react';
-import { Loader2, Webhook, Key, Users, User, CalendarDays, Bell } from 'lucide-react';
+import { Loader2, Webhook, Key, Users, User, CalendarDays, Bell, Tag } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RolesManager } from "@/components/settings/RolesManager";
 import { HolidaysManager } from "@/components/settings/HolidaysManager";
+import { TagsManager } from "@/components/settings/TagsManager";
 
 export default function Settings() {
   const { profile } = useAuth();
@@ -50,8 +51,9 @@ export default function Settings() {
         </div>
 
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="general">Geral</TabsTrigger>
+            <TabsTrigger value="tags">Tags</TabsTrigger>
             <TabsTrigger value="roles">Funções</TabsTrigger>
             <TabsTrigger value="holidays">Feriados</TabsTrigger>
             <TabsTrigger value="notifications">Notificações</TabsTrigger>
@@ -89,6 +91,24 @@ export default function Settings() {
                 </form>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="tags" className="space-y-4">
+             <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Tag className="h-5 w-5" />
+                        Tags do CRM
+                    </CardTitle>
+                    <CardDescription>
+                        Crie e gerencie as tags utilizadas para categorizar leads e clientes.
+                        Defina funções ou descrições para cada uma.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <TagsManager />
+                </CardContent>
+             </Card>
           </TabsContent>
 
           <TabsContent value="roles" className="space-y-4">

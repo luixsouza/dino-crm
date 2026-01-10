@@ -73,9 +73,10 @@ export function useLeads() {
 
   const updateLead = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Lead> & { id: string }) => {
+      const { tags, ...cleanUpdates } = updates as any;
       const { data, error } = await supabase
         .from('leads')
-        .update(updates)
+        .update(cleanUpdates)
         .eq('id', id)
         .select()
         .single();
