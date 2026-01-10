@@ -15,6 +15,7 @@ import {
   ClipboardList,
   DollarSign,
   Package,
+  Briefcase, // or UserCog
 } from 'lucide-react';
 
 const navItems = [
@@ -23,6 +24,7 @@ const navItems = [
   { href: '/leads', icon: Users, label: 'Clientes' },
   { href: '/orders', icon: ClipboardList, label: 'Comandas' },
   { href: '/products', icon: Package, label: 'Produtos' },
+  { href: '/employees', icon: Briefcase, label: 'Equipe' },
   { href: '/finance', icon: DollarSign, label: 'Financeiro' },
   { href: '/chat', icon: MessageSquare, label: 'Chat Bot' },
   { href: '/tasks', icon: CheckSquare, label: 'Tarefas' },

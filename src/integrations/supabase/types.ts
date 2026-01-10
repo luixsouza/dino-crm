@@ -64,6 +64,33 @@ export interface Database {
           }
         ]
       }
+      roles: {
+        Row: {
+          id: string
+          name: string
+          label: string
+          description: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          label: string
+          description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          label?: string
+          description?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      },
       commissions: {
         Row: {
           amount: number
@@ -578,7 +605,8 @@ export interface Database {
           id: string
           name: string
           updated_at: string
-          user_id: string
+          user_id: string | null
+          role: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -587,7 +615,8 @@ export interface Database {
           id?: string
           name: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
+          role?: string
         }
         Update: {
           avatar_url?: string | null
@@ -596,7 +625,8 @@ export interface Database {
           id?: string
           name?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
+          role?: string
         }
         Relationships: []
       }
