@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
-import { Plus, Pencil, Trash2, Users, UserCircle } from "lucide-react";
+import { Plus, Pencil, Trash2, Users, UserCircle, CalendarClock } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useEmployees, Employee } from "@/hooks/useEmployees";
 import { EmployeeDialog } from "@/components/employees/EmployeeDialog";
+import { WorkScheduleDialog } from "@/components/employees/WorkScheduleDialog";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -31,12 +32,19 @@ export default function Employees() {
   const { toast } = useToast();
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [employeeToEdit, setEmployeeToEdit] = useState<Employee | undefined>(undefined);
+  const [employeeToSchedule, setEmployeeToSchedule] = useState<Employee | null>(null);
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
 
   const handleEdit = (employee: Employee) => {
     setEmployeeToEdit(employee);
     setIsDialogOpen(true);
+  };
+
+  const handleSchedule = (employee: Employee) => {
+      setEmployeeToSchedule(employee);
+      setIsScheduleOpen(true);
   };
 
   const handleDelete = async () => {
@@ -144,6 +152,14 @@ export default function Employees() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
+                         <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Expediente"
+                          onClick={() => handleSchedule(employee)}
+                        >
+                          <CalendarClock className="h-4 w-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"
@@ -172,6 +188,12 @@ export default function Employees() {
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           employeeToEdit={employeeToEdit}
+        />
+        
+        <WorkScheduleDialog 
+            open={isScheduleOpen}
+            onOpenChange={setIsScheduleOpen}
+            employee={employeeToSchedule}
         />
 
         <AlertDialog open={!!employeeToDelete} onOpenChange={() => setEmployeeToDelete(null)}>

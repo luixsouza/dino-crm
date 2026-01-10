@@ -91,6 +91,52 @@ export interface Database {
         }
         Relationships: []
       },
+      work_schedules: {
+        Row: {
+            id: string
+            profile_id: string
+            day_of_week: number
+            start_time: string
+            end_time: string
+            break_start: string | null
+            break_end: string | null
+            is_active: boolean
+            created_at: string
+            updated_at: string
+        }
+        Insert: {
+            id?: string
+            profile_id: string
+            day_of_week: number
+            start_time?: string
+            end_time?: string
+            break_start?: string | null
+            break_end?: string | null
+            is_active?: boolean
+            created_at?: string
+            updated_at?: string
+        }
+        Update: {
+            id?: string
+            profile_id?: string
+            day_of_week?: number
+            start_time?: string
+            end_time?: string
+            break_start?: string | null
+            break_end?: string | null
+            is_active?: boolean
+            created_at?: string
+            updated_at?: string
+        }
+        Relationships: [
+            {
+                foreignKeyName: "work_schedules_profile_id_fkey"
+                columns: ["profile_id"]
+                referencedRelation: "profiles"
+                referencedColumns: ["id"]
+            }
+        ]
+      },
       commissions: {
         Row: {
           amount: number
