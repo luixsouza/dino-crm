@@ -16,7 +16,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { from, message, external_id } = await req.json();
+    const { from, message, external_id, name, profile_pic_url } = await req.json();
 
     if (!from || !message) {
       return new Response(JSON.stringify({ error: 'Missing required fields: from, message' }), {
@@ -25,7 +25,7 @@ serve(async (req) => {
       });
     }
 
-    console.log('Webhook received:', { from, message, external_id });
+    console.log('Webhook received:', { from, message, external_id, name });
 
     // Find or create lead by WhatsApp number
     let { data: lead } = await supabase
@@ -40,6 +40,8 @@ serve(async (req) => {
         .from('leads')
         .insert({
           whatsapp: from,
+          name: name || from, // Use provided name or fallback to number
+          avatar_url: profile_pic_url,
           source: 'whatsapp',
           stage: 'lead',
         })
@@ -63,6 +65,15 @@ serve(async (req) => {
       }
 
       console.log('Created new lead:', lead.id);
+    } else {
+       // Update existing lead info if new data is provided (e.g. name discovered later)
+       if (name && (!lead.name || lead.name === lead.whatsapp)) {
+           await supabase.from('leads').update({ name }).eq('id', lead.id);
+           lead.name = name;
+       }
+       if (profile_pic_url && !lead.avatar_url) {
+           await supabase.from('leads').update({ avatar_url: profile_pic_url }).eq('id', lead.id);
+       }
     }
 
     // Find or create conversation
@@ -97,13 +108,16 @@ serve(async (req) => {
       metadata: { external_id, from },
     });
 
-    // Get conversation history
-    const { data: messages } = await supabase
+    // Get conversation history (LATEST 20)
+    const { data: messagesRaw } = await supabase
       .from('messages')
       .select('role, content')
       .eq('conversation_id', conversation.id)
-      .order('created_at', { ascending: true })
+      .order('created_at', { ascending: false }) // Newest first
       .limit(20);
+    
+    // Reverse to retain chronological order for context (Oldest -> Newest)
+    const messages = messagesRaw ? messagesRaw.reverse() : [];
 
     // Call the chat-crm function to get AI response
     const chatResponse = await fetch(`${supabaseUrl}/functions/v1/chat-crm`, {
