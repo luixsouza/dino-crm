@@ -48,7 +48,7 @@ export function Sidebar() {
       {/* Logo */}
       <div className="p-6 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
-          <img src="/dino-logo.png" alt="Dino CRM" className="h-10 w-10 object-contain" />
+          <img src="/dino-png.png" alt="Dino CRM" className="h-10 w-10 object-contain" />
           <h1 className="text-xl font-bold text-sidebar-foreground">Dino CRM</h1>
         </div>
         <p className="text-xs text-muted-foreground mt-1">Barbearia Seu Dino</p>

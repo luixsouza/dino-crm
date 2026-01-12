@@ -43,10 +43,9 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <img src="/dino-logo.png" alt="Dino" className="h-8 w-8 object-contain" />
-              Dino CRM
+              Dashboard
             </h1>
-            <p className="text-muted-foreground">Dashboard - {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}</p>
+            <p className="text-muted-foreground">Seja bem-vindo(a)! - {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}</p>
           </div>
           <Button variant="outline" onClick={() => setShowCommissionsDialog(true)}>
             <CreditCard className="mr-2 h-4 w-4" />
