@@ -64,7 +64,6 @@ export function AppointmentDialog({ open, onOpenChange }: AppointmentDialogProps
   const handleSchedule = async () => {
     const isQuick = activeTab === 'quick';
     
-    // Validation
     if (!date || !selectedProfessional || !selectedService || !selectedTime) {
       toast({ title: "Erro", description: "Preencha data, hora, profissional e serviço.", variant: "destructive" });
       return;
@@ -84,6 +83,15 @@ export function AppointmentDialog({ open, onOpenChange }: AppointmentDialogProps
       const [hours, minutes] = selectedTime.split(":").map(Number);
       const scheduledAt = new Date(date);
       scheduledAt.setHours(hours, minutes, 0, 0);
+
+      if (scheduledAt < new Date()) {
+        toast({
+          title: "Erro",
+          description: "Não é possível agendar em uma data/hora passada.",
+          variant: "destructive"
+        });
+        return;
+      }
 
       await createAppointment.mutateAsync({
         lead_id: isQuick ? undefined : selectedClient,
@@ -192,6 +200,7 @@ export function AppointmentDialog({ open, onOpenChange }: AppointmentDialogProps
                                 onSelect={setDate}
                                 initialFocus
                                 locale={ptBR}
+                                disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                             />
                         </div>
                     </div>
@@ -318,6 +327,7 @@ export function AppointmentDialog({ open, onOpenChange }: AppointmentDialogProps
                                 onSelect={setDate}
                                 initialFocus
                                 locale={ptBR}
+                                disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                             />
                         </div>
                     </div>
