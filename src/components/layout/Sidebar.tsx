@@ -21,6 +21,7 @@ import {
 const navItems = [
   { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/pipeline', icon: Calendar, label: 'Funil' },
+  { href: '/appointments', icon: Scissors, label: 'Agendamentos' },
   { href: '/leads', icon: Users, label: 'Clientes' },
   { href: '/orders', icon: ClipboardList, label: 'Comandas' },
   { href: '/products', icon: Package, label: 'Produtos' },

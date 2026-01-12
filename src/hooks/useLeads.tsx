@@ -11,11 +11,11 @@ export function useLeads() {
   const { data: leads = [], isLoading, error } = useQuery({
     queryKey: ['leads'],
     queryFn: async () => {
+      // Simplificando a query para evitar erros de join se a relação não existir ou estiver vazia
       const { data, error } = await supabase
         .from('leads')
         .select(`
           *,
-          assigned_profile:profiles!leads_assigned_to_fkey(*),
           lead_tags(
             tag:tags(*)
           ),
@@ -23,7 +23,10 @@ export function useLeads() {
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching leads:', error);
+        throw error;
+      };
 
       // Transform to match our type
       return (data || []).map(lead => ({

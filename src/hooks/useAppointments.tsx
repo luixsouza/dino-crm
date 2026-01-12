@@ -46,22 +46,24 @@ export function useAppointments() {
 
   // Create appointment
   const createAppointment = useMutation({
-    mutationFn: async (data: { lead_id: string; service_id: string; barber_id?: string; scheduled_at: string; notes?: string }) => {
+    mutationFn: async (data: { lead_id: string; service_id: string; barber_id?: string; scheduled_at: string; notes?: string; is_fit_in?: boolean }) => {
       
-      // Check for schedule blocks
-      if (data.barber_id) {
-        const { data: service, error: serviceError } = await supabase
+      const { data: service, error: serviceError } = await supabase
           .from('services')
           .select('duration_minutes')
           .eq('id', data.service_id)
           .single();
 
-        if (serviceError) throw serviceError;
+      if (serviceError) throw serviceError;
 
-        const duration = service.duration_minutes || 30;
-        const startDate = new Date(data.scheduled_at);
-        const endDate = new Date(startDate.getTime() + duration * 60000);
+      const duration = service.duration_minutes || 30;
+      const startDate = new Date(data.scheduled_at);
+      const endDate = new Date(startDate.getTime() + duration * 60000);
 
+      // Check conflicts if NOT fit-in
+      if (data.barber_id && !data.is_fit_in) {
+        
+        // 1. Check Schedule Blocks
         const { data: blocks, error: blocksError } = await supabase
           .from('schedule_blocks')
           .select('*')
@@ -75,11 +77,43 @@ export function useAppointments() {
           const reason = blocks[0].reason ? `: ${blocks[0].reason}` : "";
           throw new Error(`O profissional está bloqueado neste horário${reason}`);
         }
+
+        // 2. Check Existing Appointments (Double Booking)
+        const dayStart = new Date(startDate); 
+        dayStart.setHours(0,0,0,0);
+        const dayEnd = new Date(startDate); 
+        dayEnd.setHours(23,59,59,999);
+
+        const { data: existingAppts, error: apptError } = await supabase
+              .from('appointments')
+              .select('scheduled_at, service:services(duration_minutes)')
+              .eq('barber_id', data.barber_id)
+              .neq('status', 'cancelled')
+              .gte('scheduled_at', dayStart.toISOString())
+              .lte('scheduled_at', dayEnd.toISOString());
+
+        if (apptError) throw apptError;
+
+        const hasConflict = existingAppts.some((appt: any) => {
+             const existStart = new Date(appt.scheduled_at);
+             const existDuration = appt.service?.duration_minutes || 30;
+             const existEnd = new Date(existStart.getTime() + existDuration * 60000);
+             
+             // Overlap: (StartA < EndB) and (EndA > StartB)
+             return (startDate < existEnd && endDate > existStart);
+        });
+
+        if (hasConflict) {
+            throw new Error("Horário já reservado. Use 'Encaixe' para permitir.");
+        }
       }
+      
+      // Clean up auxiliary fields before insert
+      const { is_fit_in, ...insertData } = data;
 
       const { data: result, error } = await supabase
         .from('appointments')
-        .insert(data)
+        .insert(insertData)
         .select()
         .single();
 

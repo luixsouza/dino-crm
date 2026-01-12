@@ -22,8 +22,12 @@ export function useEmployees() {
                 .from('profiles')
                 .select('*')
                 .order('name');
-            if (error) throw error;
-            return data as Employee[];
+            
+            if (error) {
+                console.error('Error fetching employees:', error);
+                throw error;
+            }
+            return (data || []) as Employee[];
         },
     });
 
