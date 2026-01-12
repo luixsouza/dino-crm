@@ -113,6 +113,9 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <img src="/dino-logo.png" alt="Dino CRM" className="h-24 w-24 object-contain" />
+          </div>
           <CardTitle className="text-2xl">Dino CRM</CardTitle>
           <CardDescription>Entre ou crie sua conta para acessar o sistema</CardDescription>
         </CardHeader>
