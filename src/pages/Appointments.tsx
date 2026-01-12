@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { format } from "date-fns";
+import { AppLayout } from '@/components/layout/AppLayout';
 import { Filter, Plus, Clock, User, Scissors, Loader2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,9 +32,7 @@ export default function Appointments() {
   const { appointments, isLoading, updateAppointmentStatus } = useAppointments(); 
   const [filterText, setFilterText] = useState("");
 
-  // Filtering
   const filteredAppointments = (appointments || []).filter(apt => {
-    // Basic filter implementation
     if (!filterText) return true;
     const searchString = filterText.toLowerCase();
     const clientName = (apt.lead?.name || "").toLowerCase();
@@ -64,6 +63,7 @@ export default function Appointments() {
   };
 
   return (
+    <AppLayout>
     <div className="container mx-auto p-6 space-y-8 animate-in fade-in">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -172,5 +172,6 @@ export default function Appointments() {
         onOpenChange={setIsNewAppointmentOpen} 
       />
     </div>
+    </AppLayout>
   );
 }

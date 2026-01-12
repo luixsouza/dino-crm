@@ -135,7 +135,8 @@ export interface Lead {
 
 export interface Appointment {
   id: string;
-  lead_id: string;
+  lead_id?: string;
+  client_name?: string;
   service_id: string;
   barber_id?: string;
   scheduled_at: string;

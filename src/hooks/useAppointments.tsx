@@ -46,7 +46,7 @@ export function useAppointments() {
 
   // Create appointment
   const createAppointment = useMutation({
-    mutationFn: async (data: { lead_id: string; service_id: string; barber_id?: string; scheduled_at: string; notes?: string; is_fit_in?: boolean }) => {
+    mutationFn: async (data: { lead_id?: string; client_name?: string; service_id: string; barber_id?: string; scheduled_at: string; notes?: string; is_fit_in?: boolean }) => {
       
       const { data: service, error: serviceError } = await supabase
           .from('services')
